@@ -1,0 +1,523 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Organigrama TutorLink</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Work+Sans:wght@600;700;800&display=swap">
+<style>
+/* Layout: título centrado con marca a la derecha; árbol CEO > 4 responsables > 3 especialistas con rectángulos azules como en la captura; ficha lateral (hoja inferior en móvil) al pulsar una persona; tabla resumen debajo. */
+:root{
+  --bg:#ffffff; --fg:#22314d; --muted:#586883; --line:#b4c3d9; --surface:#f3f6fb; --accent:#2f6fba;
+  --lv1:#1d4e8c; --lv1-fg:#ffffff;
+  --lv2:#3a78c2; --lv2-fg:#ffffff;
+  --lv3:#e3edfa; --lv3-fg:#1d3a66; --lv3-line:#9dbbe3;
+  --warm:#e58a3c; --teal:#4fc1b9;
+  --shadow:rgba(20,34,60,.22);
+  --font-display:"Work Sans",system-ui,sans-serif;
+  --font-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1726; --fg:#e7eef9; --muted:#9db0cc; --line:#3b4f70; --surface:#16213a; --accent:#7db0ee;
+    --lv1:#3873bd; --lv1-fg:#ffffff;
+    --lv2:#27538a; --lv2-fg:#ffffff;
+    --lv3:#1b2a45; --lv3-fg:#dbe8fb; --lv3-line:#3f5b87;
+    --warm:#f0a05a; --teal:#63d0c8;
+    --shadow:rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1726; --fg:#e7eef9; --muted:#9db0cc; --line:#3b4f70; --surface:#16213a; --accent:#7db0ee;
+  --lv1:#3873bd; --lv1-fg:#ffffff;
+  --lv2:#27538a; --lv2-fg:#ffffff;
+  --lv3:#1b2a45; --lv3-fg:#dbe8fb; --lv3-line:#3f5b87;
+  --warm:#f0a05a; --teal:#63d0c8;
+  --shadow:rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:var(--font-body); font-size:15px; line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:28px 56px;
+}
+.wrap{max-width:1140px;margin:0 auto}
+
+/* Cabecera */
+.top{display:grid;grid-template-columns:1fr auto 1fr;grid-template-areas:". title brand";align-items:center;gap:16px}
+.top h1{grid-area:title;margin:0;text-align:center;font-family:var(--font-display);font-weight:800;font-size:clamp(2rem,5.2vw,3.5rem);line-height:1.05;letter-spacing:-.01em;text-wrap:balance}
+.brand{grid-area:brand;justify-self:end;display:flex;align-items:center;gap:4px;font-family:var(--font-display);font-weight:800;font-size:1.5rem;letter-spacing:-.01em}
+.brand .star{color:var(--accent);font-size:1.5rem;line-height:1}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;margin:26px 0 6px;padding:0;list-style:none;font-size:13.5px;color:var(--muted)}
+.legend li{display:flex;align-items:center;gap:8px}
+.sw{width:18px;height:12px;display:inline-block}
+.sw.lv1{background:var(--lv1)}
+.sw.lv2{background:var(--lv2)}
+.sw.lv3{background:var(--lv3);border:1.5px solid var(--lv3-line)}
+.hint{margin:0;text-align:center;color:var(--muted);font-size:14px}
+
+/* Árbol */
+.tree-scroll{overflow-x:auto;padding:28px 0 8px}
+.tree ul{list-style:none;margin:0;padding:0}
+.tree li{position:relative}
+.node{
+  appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:12px;width:184px;text-align:center;
+}
+.node.lv1{--nbg:var(--lv1);--nfg:var(--lv1-fg);--nline:var(--lv1)}
+.node.lv2{--nbg:var(--lv2);--nfg:var(--lv2-fg);--nline:var(--lv2)}
+.node.lv3{--nbg:var(--lv3);--nfg:var(--lv3-fg);--nline:var(--lv3-line)}
+.avatar{
+  flex:none;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;
+  background-color:hsl(var(--h,210) 42% 42%);background-size:cover;background-position:center;
+  color:#fff;font:800 26px/1 var(--font-display);
+  box-shadow:0 0 0 3px var(--bg),0 0 0 4.5px var(--line);
+}
+.label{
+  width:100%;min-height:78px;padding:12px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;
+  background:var(--nbg);color:var(--nfg);border:1.5px solid var(--nline);font-family:var(--font-display);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.role{font-weight:600;font-size:14px;line-height:1.25}
+.who{font-weight:800;font-size:15.5px;line-height:1.25}
+.node:hover .label{transform:translateY(-2px);box-shadow:0 8px 18px var(--shadow)}
+.node:focus-visible{outline:3px solid var(--accent);outline-offset:5px}
+.note{margin:10px 0 0;max-width:176px;text-align:center;font-size:12.5px;line-height:1.35;color:var(--muted)}
+
+@media (min-width:1061px){
+  .tree li{display:flex;flex-direction:column;align-items:center;padding:26px 10px 0}
+  .tree > ul > li{padding-top:0}
+  .tree ul ul{display:flex;justify-content:center;padding-top:26px;position:relative}
+  .tree ul ul::before{content:"";position:absolute;top:0;left:50%;height:26px;border-left:2px solid var(--line)}
+  .tree ul ul > li::before,.tree ul ul > li::after{content:"";position:absolute;top:0;right:50%;width:50%;height:26px;border-top:2px solid var(--line)}
+  .tree ul ul > li::after{right:auto;left:50%;border-left:2px solid var(--line)}
+  .tree ul ul > li:only-child{padding-top:0}
+  .tree ul ul > li:only-child::before,.tree ul ul > li:only-child::after{display:none}
+  .tree ul ul > li:first-child::before,.tree ul ul > li:last-child::after{border:0 none}
+  .tree ul ul > li:last-child::before{border-right:2px solid var(--line)}
+}
+@media (max-width:1060px){
+  .tree-scroll{padding-top:20px}
+  .tree li{display:block;padding:14px 0 0 22px}
+  .tree > ul > li{padding:0}
+  .tree ul ul{margin-left:28px;border-left:2px solid var(--line)}
+  .tree ul ul > li::before{content:"";position:absolute;left:0;top:46px;width:22px;border-top:2px solid var(--line)}
+  .node{flex-direction:row;align-items:center;width:100%;max-width:440px;gap:14px;text-align:left}
+  .avatar{width:56px;height:56px;font-size:19px}
+  .label{flex:1;min-width:0;min-height:0;align-items:flex-start;padding:10px 12px}
+  .note{margin:6px 0 0 70px;max-width:none;text-align:left}
+}
+.support{
+  margin:26px auto 0;max-width:640px;padding:12px 16px;border:1.5px dashed var(--line);
+  text-align:center;color:var(--muted);font-size:13.5px;
+}
+
+/* Tabla resumen */
+.summary{margin-top:56px}
+.summary h2{margin:0 0 4px;font-family:var(--font-display);font-weight:700;font-size:1.6rem;letter-spacing:-.005em}
+.summary > p{margin:0 0 18px;color:var(--muted)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th{text-align:left;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:0 14px 10px 0;border-bottom:2px solid var(--fg)}
+td{padding:14px 14px 14px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child{white-space:nowrap}
+.who-link{
+  appearance:none;background:none;border:0;padding:0;font:inherit;text-align:left;cursor:pointer;color:var(--accent);
+  font-weight:600;text-decoration:underline;text-underline-offset:3px;
+}
+.who-link:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.sub{display:block;color:var(--muted);font-size:13px}
+
+/* Ficha */
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(10,18,32,.5)}
+.sheet{
+  position:fixed;z-index:30;top:0;right:0;bottom:0;width:min(500px,100%);overflow-y:auto;overscroll-behavior:contain;
+  background:var(--bg);color:var(--fg);box-shadow:-14px 0 40px var(--shadow);
+  padding-top:calc(26px + env(safe-area-inset-top,0px));
+  padding-bottom:calc(36px + env(safe-area-inset-bottom,0px));
+  padding-left:26px;
+  padding-right:max(26px,env(safe-area-inset-right,0px));
+  animation:slide-in .22s ease-out;
+}
+.sheet:focus{outline:none}
+@keyframes slide-in{from{transform:translateX(28px);opacity:0}to{transform:none;opacity:1}}
+@keyframes rise-in{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.close{
+  position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));
+  width:42px;height:42px;display:grid;place-items:center;background:var(--surface);color:var(--fg);border:0;border-radius:50%;cursor:pointer;
+}
+.close:hover{background:var(--line)}
+.close:focus-visible,.btn:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.sheet-head{display:flex;align-items:center;gap:16px;padding-right:44px}
+.sheet-head .avatar{width:76px;height:76px;font-size:24px}
+.sheet-head h2{margin:0;font-family:var(--font-display);font-weight:800;font-size:1.45rem;line-height:1.15;letter-spacing:-.005em;text-wrap:balance}
+.puesto{margin:4px 0 0;color:var(--muted);font-size:14px;line-height:1.35}
+.chip{display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;margin:18px 0 0;padding:18px 0;border-block:1px solid var(--line)}
+.facts div{min-width:0}
+.facts .wide{grid-column:1 / -1}
+dt,.k{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+dd{margin:0}
+.block{margin-top:22px}
+.block h3{margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.block ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.block p{margin:0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;padding:0;list-style:none}
+.tags li{padding:3px 10px;background:var(--surface);border:1px solid var(--line);font-size:13px}
+.photo{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.photo .k{flex-basis:100%;margin:0}
+.btn{
+  display:inline-flex;align-items:center;padding:8px 14px;background:var(--surface);color:var(--fg);border:1px solid var(--line);
+  font:600 13.5px var(--font-body);cursor:pointer;
+}
+.btn:hover{border-color:var(--accent)}
+.btn input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.photo small{flex-basis:100%;color:var(--muted);font-size:12.5px}
+
+@media (max-width:640px){
+  .top{grid-template-columns:1fr;grid-template-areas:"brand" "title"}
+  .brand{justify-self:center}
+  .sheet{
+    top:auto;left:0;right:0;width:100%;max-height:88%;border-radius:16px 16px 0 0;box-shadow:0 -14px 40px var(--shadow);
+    padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));
+    animation-name:rise-in;
+  }
+  .facts{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Organigrama RRHH</h1>
+    <div class="brand" aria-label="TutorLink">TutorLink<span class="star" aria-hidden="true">✱</span></div>
+  </header>
+
+  <ul class="legend" aria-label="Niveles jerárquicos">
+    <li><span class="sw lv1"></span>Nivel directivo (1)</li>
+    <li><span class="sw lv2"></span>Responsables de departamento (4)</li>
+    <li><span class="sw lv3"></span>Nivel operativo (3)</li>
+  </ul>
+  <p class="hint">Pulsa sobre una persona para ver su ficha de puesto.</p>
+
+  <div class="tree-scroll"><div class="tree" id="tree"></div></div>
+  <p class="support">Asesoría jurídica y fiscal y auditoría técnica: apoyo externo contratado según necesidad.</p>
+
+  <section class="summary" aria-labelledby="resumen-h">
+    <h2 id="resumen-h">Resumen de funciones por puesto</h2>
+    <p>Fase piloto: los ocho socios promotores cubren todos los puestos a tiempo parcial, sin contratar personal externo.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Persona y puesto</th><th>Departamento</th><th>Funciones principales</th><th>Depende de</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" tabindex="-1" hidden>
+  <button type="button" class="close" id="close" aria-label="Cerrar ficha">
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+  </button>
+  <div id="sheet-body"></div>
+</aside>
+
+<script>
+const people = [
+  {
+    id:"marcos", name:"Marcos García", ini:"MG", hue:210, nivel:1, parent:null,
+    card:"Dirección General (CEO)", puesto:"Dirección General (CEO)",
+    depto:"Dirección General", lugar:"Híbrido: oficina coworking en Salamanca o remoto",
+    depende:"Junta de socios", personal:"4 responsables de departamento: CTO, COO, CMO y CFO", plantilla:"1 persona",
+    funciones:[
+      "Representar institucionalmente a TutorLink.",
+      "Negociar convenios y acuerdos con facultades y residencias de la USAL y la UPSA.",
+      "Fijar las metas SMART del proyecto y vigilar su cumplimiento.",
+      "Supervisar la viabilidad global y coordinar los cuatro departamentos."
+    ],
+    resp:[
+      "Resultados del piloto de seis meses en Salamanca.",
+      "Coherencia entre estrategia, presupuesto y organización.",
+      "A futuro, nombrar directivos por zona cuando TutorLink se expanda por la península."
+    ],
+    formacion:"Grado en ADE, Economía o similar. Experiencia en gestión de proyectos o de equipos.",
+    habilidades:["Liderazgo","Negociación","Comunicación institucional","Visión estratégica"],
+    pestel:"Responde a la conclusión del PESTEL de afianzar la empresa a nivel local con alianzas educativas sólidas.",
+    retrib:"32.000 € brutos al año a jornada completa (propuesta presupuestaria).",
+    resumen:"Representa a TutorLink, negocia convenios con la USAL y la UPSA, fija metas y coordina los departamentos."
+  },
+  {
+    id:"hector", name:"Héctor Crespo", ini:"HC", hue:175, nivel:2, parent:"marcos",
+    card:"Tecnología e IA (CTO)", puesto:"Dirección de Tecnología, Producto e IA (CTO)",
+    depto:"Tecnología, Producto e IA", lugar:"Híbrido: Salamanca o teletrabajo",
+    depende:"Dirección General", personal:"2 especialistas: Alejandro Gil (desarrollo) y Daniel (infraestructura)", plantilla:"1 persona",
+    funciones:[
+      "Supervisar la arquitectura técnica de la web y la app móvil.",
+      "Integrar el aula virtual con videollamadas y pizarra interactiva.",
+      "Desplegar el módulo de IA que aclara dudas a los alumnos con suscripción.",
+      "Coordinar al equipo cuando algo falla o da error."
+    ],
+    resp:[
+      "Disponibilidad y calidad de la plataforma.",
+      "Evitar futuros problemas de software y hardware de la empresa.",
+      "Cumplir el plan de producto del piloto."
+    ],
+    formacion:"Ingeniería informática o similar. Experiencia en desarrollo web y móvil y en servicios en la nube.",
+    habilidades:["Visión técnica","Coordinación de equipos","Resolución de incidencias","Comunicación con perfiles no técnicos"],
+    pestel:"Cubre el factor tecnológico: herramientas colaborativas y de IA.",
+    retrib:"32.000 € brutos al año a jornada completa (propuesta presupuestaria).",
+    resumen:"Dirige la arquitectura web y móvil, el aula virtual y la IA, y coordina al equipo técnico."
+  },
+  {
+    id:"manuelale", name:"Manuel Alejandro", ini:"MA", hue:28, nivel:2, parent:"marcos",
+    card:"Operaciones y Legal (COO)", puesto:"Dirección de Operaciones, Calidad y Cumplimiento Legal (COO)",
+    depto:"Operaciones, Calidad y Cumplimiento Legal", lugar:"Híbrido: Cádiz o remoto",
+    depende:"Dirección General", personal:"1 especialista: Manuel Gayo (confianza y atención a usuarios)", plantilla:"1 persona",
+    funciones:[
+      "Supervisar el cumplimiento de la normativa de la AEPD y el RGPD.",
+      "Aplicar el Reglamento europeo de Servicios Digitales (DSA).",
+      "Redactar las condiciones de contratación, cancelaciones y reembolsos.",
+      "Definir los protocolos de autorización parental para alumnos menores de edad."
+    ],
+    resp:[
+      "Evitar sanciones y pérdida de confianza por incumplimientos legales.",
+      "Que quede bien definida la relación profesional con los profesores.",
+      "Calidad del servicio prestado."
+    ],
+    formacion:"Grado en Derecho, ADE o similar. Conocimientos de protección de datos y comercio electrónico.",
+    habilidades:["Rigor","Análisis normativo","Organización","Comunicación clara"],
+    pestel:"Aborda la dimensión legal, el mayor riesgo operacional del PESTEL: protección de menores y DSA.",
+    retrib:"28.000 € brutos al año a jornada completa (propuesta presupuestaria).",
+    resumen:"Vela por el RGPD y el DSA, redacta condiciones y reembolsos y define la autorización parental."
+  },
+  {
+    id:"alvaro", name:"Álvaro Díaz", ini:"AD", hue:340, nivel:2, parent:"marcos",
+    card:"Marketing y Captación (CMO)", puesto:"Dirección de Marketing, Captación y Comunidad (CMO)",
+    depto:"Marketing y Captación", lugar:"Campus de Salamanca y canales digitales",
+    depende:"Dirección General", personal:"Ninguno: ejecuta él mismo las acciones comerciales", plantilla:"1 persona",
+    note:"Ejecución comercial y de comunidad en el mismo puesto",
+    funciones:[
+      "Captar profesores y alumnos a la vez.",
+      "Organizar campañas presenciales en los campus de la USAL y la UPSA.",
+      "Gestionar campañas en Instagram, TikTok y Google Ads.",
+      "Diseñar ofertas y packs de clases."
+    ],
+    resp:[
+      "Alcanzar la masa crítica de profesores y estudiantes del piloto.",
+      "Gestionar el presupuesto de marketing del piloto (1.050 €)."
+    ],
+    formacion:"Marketing, ADE o Comunicación. Experiencia con redes sociales y publicidad digital.",
+    habilidades:["Creatividad","Comunicación","Análisis de métricas","Trato con asociaciones universitarias"],
+    pestel:"Aprovecha el uso de internet de más del 98 % entre los jóvenes e impulsa la captación en el entorno estudiantil salmantino.",
+    retrib:"26.000 € brutos al año a jornada completa (propuesta presupuestaria).",
+    resumen:"Capta profesores y alumnos, organiza campañas en campus y redes y diseña ofertas y packs."
+  },
+  {
+    id:"carlos", name:"Carlos Fraile", ini:"CF", hue:265, nivel:2, parent:"marcos",
+    card:"Finanzas (CFO)", puesto:"Dirección Financiera y Control de Pagos (CFO)",
+    depto:"Administración y Finanzas", lugar:"Híbrido: Salamanca o remoto",
+    depende:"Dirección General", personal:"Ninguno: gestiona él mismo cobros, pasarelas y liquidaciones", plantilla:"1 persona",
+    note:"Cobros, pasarelas y liquidaciones en el mismo puesto",
+    funciones:[
+      "Supervisar los pagos digitales.",
+      "Retener la comisión por clase (entre el 10 % y el 15 %).",
+      "Automatizar las transferencias a los profesores al terminar la clase.",
+      "Elaborar presupuestos de tesorería y controlar los márgenes frente a los rivales."
+    ],
+    resp:[
+      "Que el dinero retenido llegue al profesor tras la clase.",
+      "Viabilidad económica dentro del capital inicial previsto de 3.000 €."
+    ],
+    formacion:"ADE, Finanzas o Economía. Experiencia en contabilidad y tesorería.",
+    habilidades:["Rigor numérico","Control del gasto","Hojas de cálculo y pasarelas de pago","Integridad"],
+    pestel:"Da soporte al factor económico: aceptación del pago online (83 % de los internautas) y vigilancia de comisiones competitivas.",
+    retrib:"26.000 € brutos al año a jornada completa (propuesta presupuestaria).",
+    resumen:"Controla pagos, comisión y liquidaciones a profesores, y la tesorería y los márgenes."
+  },
+  {
+    id:"alejandro", name:"Alejandro Gil", ini:"AG", hue:150, nivel:3, parent:"hector",
+    card:"Desarrollo y Antifuga", puesto:"Desarrollador Full-Stack y Sistemas Anti-Fuga",
+    depto:"Tecnología, Producto e IA", lugar:"Híbrido o remoto",
+    depende:"Héctor Crespo (CTO)", personal:"Ninguno", plantilla:"1 persona",
+    funciones:[
+      "Programar el motor de búsqueda de profesores, con filtros por nivel, asignatura y precio.",
+      "Desarrollar el calendario interactivo de reservas.",
+      "Integrar las pasarelas de pago.",
+      "Crear el modelo que bloquea teléfonos, correos y datos de contacto en el chat interno."
+    ],
+    resp:[
+      "Que el filtro anti-fuga evite cerrar clases o pagos fuera de TutorLink.",
+      "Entregar en plazo las funciones del núcleo de la plataforma."
+    ],
+    formacion:"Ingeniería informática o ciclo superior de desarrollo. Experiencia en programación full-stack.",
+    habilidades:["Programación web y móvil","Bases de datos","Integración de APIs de pago","Trabajo en equipo"],
+    pestel:"Crucial ante la sensibilidad al precio y la desintermediación, el riesgo económico de que las clases se cierren fuera de la plataforma.",
+    retrib:"28.000 € brutos al año a jornada completa (propuesta presupuestaria).",
+    resumen:"Programa búsqueda, reservas y pagos y el bloqueo de datos de contacto en el chat."
+  },
+  {
+    id:"daniel", name:"Daniel", ini:"D", hue:45, nivel:3, parent:"hector",
+    card:"Cloud, Redes y Eco", puesto:"Ingeniero de Infraestructura Cloud, Ciberseguridad y Ecoeficiencia",
+    depto:"Tecnología, Producto e IA", lugar:"Híbrido o remoto",
+    depende:"Héctor Crespo (CTO)", personal:"Ninguno", plantilla:"1 persona",
+    funciones:[
+      "Mantener los servidores propios y las APIs seguras.",
+      "Encriptar los datos personales de los usuarios.",
+      "Monitorizar el tiempo de actividad del servicio.",
+      "Ajustar la calidad del streaming de las videoclases para reducir el consumo energético."
+    ],
+    resp:[
+      "Continuidad del servicio y seguridad de los datos.",
+      "Reducir la huella de los centros de datos: vídeo a 720p y limpieza de archivos inactivos."
+    ],
+    formacion:"Ingeniería informática, redes o telecomunicaciones. Experiencia en cloud y ciberseguridad.",
+    habilidades:["Administración de sistemas","Seguridad informática","Monitorización","Sensibilidad ambiental"],
+    pestel:"Responde a las dimensiones tecnológica (ciberseguridad y continuidad) y ecológica (consumo energético digital).",
+    retrib:"28.000 € brutos al año a jornada completa (propuesta presupuestaria).",
+    resumen:"Mantiene servidores y APIs seguras, cifra datos, monitoriza el servicio y reduce el consumo del streaming."
+  },
+  {
+    id:"gayo", name:"Manuel Gayo", ini:"MG", hue:195, nivel:3, parent:"manuelale",
+    card:"Confianza y Usuarios", puesto:"Responsable de Confianza, Moderación y Atención a Usuarios",
+    depto:"Operaciones, Calidad y Cumplimiento Legal", lugar:"Híbrido o remoto",
+    depende:"Manuel Alejandro (COO)", personal:"Ninguno", plantilla:"1 persona",
+    funciones:[
+      "Verificar la identidad y la titulación de los profesores antes de publicar su perfil.",
+      "Moderar reseñas y valoraciones para evitar perfiles falsos.",
+      "Atender a familias y alumnos y resolver las incidencias en menos de 24 horas."
+    ],
+    resp:[
+      "Que la confianza y la reputación sostengan la adopción del servicio.",
+      "Proteger a los alumnos menores cuando se abra el servicio a ese público."
+    ],
+    formacion:"Educación, Psicología, Derecho o similar. Experiencia en atención al cliente o moderación de comunidades.",
+    habilidades:["Empatía","Comunicación escrita","Criterio","Gestión de conflictos"],
+    pestel:"Resuelve el factor social de confianza y reputación, clave para que las familias contraten a tutores desconocidos.",
+    retrib:"23.000 € brutos al año a jornada completa (propuesta presupuestaria).",
+    resumen:"Verifica profesores, modera reseñas y resuelve incidencias de usuarios en menos de 24 horas."
+  }
+];
+const byId = Object.fromEntries(people.map(p => [p.id, p]));
+const levelName = {1:"Nivel directivo", 2:"Responsable de departamento", 3:"Nivel operativo"};
+
+/* Fotos: se guardan solo en este navegador */
+let photos = {};
+try { photos = JSON.parse(localStorage.getItem("tl-fotos") || "{}"); } catch (e) { photos = {}; }
+function savePhotos(){ try { localStorage.setItem("tl-fotos", JSON.stringify(photos)); } catch (e) {} }
+function paintAvatars(){
+  document.querySelectorAll("[data-avatar]").forEach(el => {
+    const p = byId[el.dataset.avatar];
+    el.style.setProperty("--h", p.hue);
+    if (photos[p.id]) { el.style.backgroundImage = 'url("' + photos[p.id] + '")'; el.textContent = ""; }
+    else { el.style.backgroundImage = ""; el.textContent = p.ini; }
+  });
+}
+function squarePhoto(file, done){
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const s = 256, c = document.createElement("canvas"); c.width = c.height = s;
+      const m = Math.min(img.width, img.height);
+      c.getContext("2d").drawImage(img, (img.width - m) / 2, (img.height - m) * 0.15, m, m, 0, 0, s, s);
+      done(c.toDataURL("image/jpeg", 0.85));
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* Árbol */
+function nodeHTML(p){
+  const kids = people.filter(x => x.parent === p.id);
+  return '<li><button type="button" class="node lv' + p.nivel + '" data-open="' + p.id + '" aria-label="Ver ficha de ' + p.name + ', ' + p.card + '">' +
+    '<span class="avatar" data-avatar="' + p.id + '"></span>' +
+    '<span class="label"><span class="role">' + p.card + '</span><span class="who">' + p.name + '</span></span></button>' +
+    (p.note ? '<p class="note">' + p.note + '</p>' : '') +
+    (kids.length ? '<ul>' + kids.map(nodeHTML).join("") + '</ul>' : '') + '</li>';
+}
+document.getElementById("tree").innerHTML = "<ul>" + nodeHTML(people[0]) + "</ul>";
+
+/* Tabla resumen */
+document.getElementById("rows").innerHTML = people.map(p =>
+  '<tr><td><button type="button" class="who-link" data-open="' + p.id + '">' + p.name + '</button><span class="sub">' + p.card + '</span></td>' +
+  '<td>' + p.depto + '</td><td>' + p.resumen + '</td><td>' + p.depende + '</td></tr>'
+).join("");
+
+/* Ficha */
+const sheet = document.getElementById("sheet"), scrim = document.getElementById("scrim"), body = document.getElementById("sheet-body");
+let lastFocus = null, currentId = null;
+const li = arr => "<ul>" + arr.map(t => "<li>" + t + "</li>").join("") + "</ul>";
+
+function fill(p){
+  body.innerHTML =
+    '<div class="sheet-head"><span class="avatar" data-avatar="' + p.id + '"></span><div>' +
+      '<h2 id="sheet-title">' + p.name + '</h2><p class="puesto">' + p.puesto + '</p></div></div>' +
+    '<div class="chip"><span class="sw lv' + p.nivel + '"></span>' + levelName[p.nivel] + '</div>' +
+    '<dl class="facts">' +
+      '<div><dt>Departamento</dt><dd>' + p.depto + '</dd></div>' +
+      '<div><dt>Lugar de trabajo</dt><dd>' + p.lugar + '</dd></div>' +
+      '<div><dt>Depende de</dt><dd>' + p.depende + '</dd></div>' +
+      '<div><dt>Empleados en el puesto</dt><dd>' + p.plantilla + '</dd></div>' +
+      '<div class="wide"><dt>Personal a su cargo</dt><dd>' + p.personal + '</dd></div>' +
+    '</dl>' +
+    '<section class="block"><h3>Funciones y tareas principales</h3>' + li(p.funciones) + '</section>' +
+    '<section class="block"><h3>Responsabilidades</h3>' + li(p.resp) + '</section>' +
+    '<section class="block"><h3>Formación y experiencia necesarias</h3><p>' + p.formacion + '</p></section>' +
+    '<section class="block"><h3>Habilidades y competencias</h3><ul class="tags">' + p.habilidades.map(h => "<li>" + h + "</li>").join("") + '</ul></section>' +
+    '<section class="block"><h3>Conexión con el PESTEL</h3><p>' + p.pestel + '</p></section>' +
+    '<section class="block"><h3>Retribución de referencia</h3><p>' + p.retrib + ' Incentivo máximo del 5 % ligado a objetivos.</p></section>' +
+    '<section class="block"><h3>Dedicación en la fase piloto</h3><p>Socio promotor a tiempo parcial, compatible con sus estudios. Se recoge en el pacto de socios.</p></section>' +
+    '<div class="photo"><p class="k">Foto</p>' +
+      '<label class="btn"><input type="file" accept="image/*" id="photo-input">Añadir o cambiar foto</label>' +
+      '<button type="button" class="btn" id="photo-clear"' + (photos[p.id] ? '' : ' hidden') + '>Quitar foto</button>' +
+      '<small>La foto se guarda solo en este navegador.</small></div>';
+  paintAvatars();
+  document.getElementById("photo-input").addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    squarePhoto(f, url => { photos[p.id] = url; savePhotos(); paintAvatars(); fill(p); document.getElementById("photo-input").focus(); });
+  });
+  document.getElementById("photo-clear").addEventListener("click", () => {
+    delete photos[p.id]; savePhotos(); paintAvatars(); fill(p); document.getElementById("photo-input").focus();
+  });
+}
+function openSheet(id){
+  currentId = id; lastFocus = document.activeElement;
+  fill(byId[id]);
+  sheet.scrollTop = 0;
+  scrim.hidden = false; sheet.hidden = false;
+  sheet.focus();
+}
+function closeSheet(){
+  if (sheet.hidden) return;
+  sheet.hidden = true; scrim.hidden = true;
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-open]");
+  if (b) openSheet(b.dataset.open);
+});
+scrim.addEventListener("click", closeSheet);
+document.getElementById("close").addEventListener("click", closeSheet);
+document.addEventListener("keydown", e => {
+  if (sheet.hidden) return;
+  if (e.key === "Escape") { closeSheet(); return; }
+  if (e.key === "Tab") {
+    const f = Array.from(sheet.querySelectorAll("button, input, [tabindex]:not([tabindex='-1'])")).filter(x => !x.hidden && x.offsetParent !== null || x.type === "file");
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === sheet)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
+paintAvatars();
+</script>
+
+</body></html>
